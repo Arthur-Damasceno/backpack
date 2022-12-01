@@ -2,7 +2,10 @@
 name = "backpack"
 description = "A command-line interface to manage items."
 version = "0.0.0"
-authos = ["Arthur Damasceno <damascenoarthur653@gmail.com>"]
+authors = ["Arthur Damasceno <damascenoarthur653@gmail.com>"]
 repository = "https://github.com/Arthur-Damasceno/backpack"
 license = "MIT"
 edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
