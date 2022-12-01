@@ -1,18 +1,25 @@
+mod database;
+
+use database::Database;
+
 use {clap::Parser, std::path::PathBuf};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
 struct Args {
-    /// Database file name to read.
+    /// Database file path to open or create.
     #[arg(short, long)]
-    read: Option<PathBuf>,
-    /// File name to create as a database.
-    #[arg(short, long)]
-    create: Option<PathBuf>,
+    open: Option<PathBuf>,
 }
 
 fn main() {
     let args = Args::parse();
 
-    println!("{args:#?}");
+    let mut database = if let Some(name) = args.open {
+        Database::open(name)
+    } else {
+        Database::default()
+    };
+
+    database.save();
 }
