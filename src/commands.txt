@@ -1,0 +1,6 @@
+Commands:
+ list: List all items.
+ add [quantity] [name]: Add an item to the database.
+ delete [id]: Delete an item from the database.
+ save: Save the items to the database.
+ exit: Exit the program.

@@ -11,8 +11,8 @@ use crate::error::Result;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
-    name: String,
-    quantity: u32,
+    pub name: String,
+    pub quantity: u32,
 }
 
 #[derive(Debug)]

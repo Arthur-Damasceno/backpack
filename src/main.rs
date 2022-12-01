@@ -1,7 +1,8 @@
+mod command;
 mod database;
 mod error;
 
-use {database::Database, error::Result};
+use {command::Command, database::Database, error::Result};
 
 use {clap::Parser, std::path::PathBuf};
 
@@ -14,15 +15,22 @@ struct Args {
 }
 
 fn main() -> Result {
-    let args = Args::parse();
+    let Args { open } = Args::parse();
 
-    let mut database = if let Some(name) = args.open {
+    let _database = if let Some(name) = open {
         Database::open(name)?
     } else {
         Database::default()
     };
 
-    database.save()?;
-
-    Ok(())
+    loop {
+        if let Some(command) = Command::try_read() {
+            println!("{command:#?}");
+        } else {
+            eprintln!(concat!(
+                "Could not understand the command.\n",
+                include_str!("commands.txt")
+            ));
+        }
+    }
 }
