@@ -1,9 +1,13 @@
-use std::io::Write;
-
 use {
     serde::{Deserialize, Serialize},
-    std::{fs::File, io::Read, path::PathBuf},
+    std::{
+        fs::File,
+        io::{Read, Write},
+        path::PathBuf,
+    },
 };
+
+use crate::error::Result;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
@@ -18,31 +22,32 @@ pub enum Database {
 }
 
 impl Database {
-    pub fn open(name: PathBuf) -> Self {
+    pub fn open(name: PathBuf) -> Result<Self> {
         let mut file = File::options()
             .read(true)
             .write(true)
             .create(true)
-            .open(name)
-            .unwrap();
+            .open(name)?;
 
         let items = {
             let mut buf = Vec::new();
 
-            file.read_to_end(&mut buf).unwrap();
+            file.read_to_end(&mut buf)?;
 
             bincode::deserialize(&buf).unwrap_or_default()
         };
 
-        Self::Local { file, items }
+        Ok(Self::Local { file, items })
     }
 
-    pub fn save(&mut self) {
+    pub fn save(&mut self) -> Result {
         if let Self::Local { file, items } = self {
             let data = bincode::serialize(&items).unwrap();
 
-            file.write_all(&data).unwrap();
+            file.write_all(&data)?;
         }
+
+        Ok(())
     }
 }
 

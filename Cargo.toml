@@ -14,3 +14,6 @@ clap = { version = "4", features = ["derive"] }
 # Serde
 serde = { version = "1", features = ["derive"] }
 bincode = "*"
+
+# Miscellaneous
+thiserror = "*"

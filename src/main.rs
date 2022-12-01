@@ -1,6 +1,7 @@
 mod database;
+mod error;
 
-use database::Database;
+use {database::Database, error::Result};
 
 use {clap::Parser, std::path::PathBuf};
 
@@ -12,14 +13,16 @@ struct Args {
     open: Option<PathBuf>,
 }
 
-fn main() {
+fn main() -> Result {
     let args = Args::parse();
 
     let mut database = if let Some(name) = args.open {
-        Database::open(name)
+        Database::open(name)?
     } else {
         Database::default()
     };
 
-    database.save();
+    database.save()?;
+
+    Ok(())
 }
