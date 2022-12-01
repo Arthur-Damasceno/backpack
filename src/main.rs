@@ -17,15 +17,20 @@ struct Args {
 fn main() -> Result {
     let Args { open } = Args::parse();
 
-    let _database = if let Some(name) = open {
+    let mut database = if let Some(name) = open {
         Database::open(name)?
     } else {
         Database::default()
     };
 
+    println!(concat!(
+        "Welcome to Backpack! Where you can handle your items\n",
+        include_str!("commands.txt"),
+    ));
+
     loop {
         if let Some(command) = Command::try_read() {
-            println!("{command:#?}");
+            command.execute(&mut database)?;
         } else {
             eprintln!(concat!(
                 "Could not understand the command.\n",

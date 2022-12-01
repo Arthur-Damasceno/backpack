@@ -1,12 +1,15 @@
 use std::io::stdin;
 
-use crate::database::Item;
+use crate::{
+    database::{Database, Item},
+    error::Result,
+};
 
 #[derive(Debug)]
 pub enum Command {
     List,
     Add(Item),
-    Delete { id: u32 },
+    Delete { id: usize },
     Save,
     Exit,
 }
@@ -50,5 +53,39 @@ impl Command {
         } else {
             None
         }
+    }
+
+    pub fn execute(self, database: &mut Database) -> Result {
+        match self {
+            Self::List => {
+                let items = database.items();
+
+                if items.len() > 0 {
+                    println!("The items in the backpack are:");
+
+                    for (idx, item) in items.iter().enumerate() {
+                        println!("{} {item:?}", idx + 1);
+                    }
+                } else {
+                    println!("There are no items in the backpack");
+                }
+            }
+            Self::Add(item) => {
+                database.add(item);
+                println!("The item has been added");
+            }
+            Self::Delete { id } => {
+                database.delete(id)?;
+                println!("The item has been deleted");
+            }
+            Self::Save => {
+                database.save()?;
+                let amount = database.items().len();
+                println!("{amount} items were saved");
+            }
+            Self::Exit => std::process::exit(0),
+        };
+
+        Ok(())
     }
 }

@@ -2,12 +2,12 @@ use {
     serde::{Deserialize, Serialize},
     std::{
         fs::File,
-        io::{Read, Write},
+        io::{Read, Seek, Write},
         path::PathBuf,
     },
 };
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
@@ -40,10 +40,41 @@ impl Database {
         Ok(Self::Local { file, items })
     }
 
+    pub fn items(&self) -> &[Item] {
+        match self {
+            Database::Local { items, .. } => items,
+            Database::Memory(items) => items,
+        }
+    }
+
+    pub fn add(&mut self, item: Item) {
+        match self {
+            Database::Local { items, .. } => items,
+            Database::Memory(items) => items,
+        }
+        .push(item);
+    }
+
+    pub fn delete(&mut self, id: usize) -> Result {
+        let items = match self {
+            Database::Local { items, .. } => items,
+            Database::Memory(items) => items,
+        };
+
+        if id > items.len() {
+            return Err(Error::NonExistentItem);
+        }
+
+        items.remove(id - 1);
+
+        Ok(())
+    }
+
     pub fn save(&mut self) -> Result {
         if let Self::Local { file, items } = self {
             let data = bincode::serialize(&items).unwrap();
 
+            file.rewind()?;
             file.write_all(&data)?;
         }
 
